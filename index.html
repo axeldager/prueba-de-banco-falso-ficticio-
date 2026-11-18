@@ -111,6 +111,59 @@ h2{font-size:17px;margin:0 0 10px}
 .act[hidden]{display:none}
 .chip.tag{background:var(--brand);color:var(--brand-ink)}
 @media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+/* ===== Pulido visual v2 ===== */
+:root{--brand2:#4B3BD6;--r-lg:24px;--r-md:16px;--shadow:0 10px 30px -14px rgba(30,32,120,.5)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand:#5B5EE6;--brand2:#7A52E8;--shadow:0 12px 32px -16px rgba(0,0,0,.8)}}
+:root[data-theme="dark"]{--brand:#5B5EE6;--brand2:#7A52E8;--shadow:0 12px 32px -16px rgba(0,0,0,.8)}
+button{-webkit-tap-highlight-color:transparent}
+body{line-height:1.45}
+.app{padding:28px 20px 40px}
+.top{margin-bottom:20px}
+.hello{font-size:19px;letter-spacing:-.2px;line-height:1.25}
+.hello small{margin-top:2px;font-size:13px}
+.ghost{min-height:40px;padding:0 16px;border-radius:12px}
+.chip{vertical-align:middle;margin-left:8px;font-size:11px;padding:3px 9px;letter-spacing:.2px}
+.card{background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);border-radius:var(--r-lg);padding:24px;box-shadow:var(--shadow)}
+.card .lbl{letter-spacing:.2px}
+.bal{display:flex;align-items:baseline;gap:8px;font-size:42px;line-height:1.1;margin:8px 0 20px;font-variant-numeric:tabular-nums;white-space:nowrap;word-break:normal}
+.bal span{font-size:.62em;margin:0;opacity:.9}
+.bal.long{font-size:34px}
+.bal.xl{font-size:26px}
+.acct{padding:8px 14px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 28px}
+.act{flex:none;min-height:54px;padding:0 12px;border-radius:var(--r-md);font-size:15px}
+.act:active{transform:scale(.98)}
+#openAdmin{grid-column:1/-1}
+h2{font-size:17px;margin:0 0 12px;letter-spacing:-.1px}
+.list{border-radius:20px;overflow:hidden}
+.list li{padding:14px 16px;gap:14px;min-height:68px}
+.list li.empty{justify-content:center;color:var(--muted);font-size:14px}
+.ico{width:42px;height:42px;border-radius:14px;font-size:19px}
+.mv b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;line-height:1.3;font-weight:600}
+.mv small{display:block;margin-top:2px}
+.amt{font-variant-numeric:tabular-nums;text-align:right;font-size:14px}
+.foot{margin-top:28px}
+.login{padding-top:36px}
+.mark{width:60px;height:60px;border-radius:18px;margin-bottom:22px;box-shadow:var(--shadow)}
+h1{font-size:30px;letter-spacing:-.5px}
+.lead{margin-bottom:28px}
+.tabs{border-radius:16px}
+.tab{min-height:42px;border-radius:12px}
+.field{border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:var(--r-md);padding:0 16px}
+.sheet{max-height:92vh;overflow-y:auto;border-radius:28px 28px 0 0;padding:12px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.sheet::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 18px}
+.sheet h2{font-size:19px;margin-bottom:14px}
+.row{gap:12px}
+.row .btn{flex:1 1 0}
+#saveLimit{flex:0 0 auto}
+.rc{border-radius:16px}
+.ccard{border-radius:22px;padding:22px;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:var(--shadow)}
+.cc-num{font-variant-numeric:tabular-nums;font-size:21px}
+.panel{border-radius:20px;padding:18px}
+.adm li{gap:10px 12px}
+.adm .ghost{flex:1 1 0;min-height:42px}
+.toast{box-shadow:0 8px 24px -8px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
@@ -261,9 +314,9 @@ h2{font-size:17px;margin:0 0 10px}
     if(/at least|weak/i.test(m)) return 'La contraseña necesita al menos 6 caracteres.';
     if(/rate limit|too many/i.test(m)) return 'Demasiados intentos. Espera un momento.';
     if(/email/i.test(m) && /invalid/i.test(m)) return 'Supabase no aceptó ese usuario como correo. Avísale a Claude.';
-    return m || 'Algo salió mal. Intenta de nuevo.';
+    return m ? m.replace(/(?<![\w-])\d{4,}(?!\w)/g, function(x){ return fmt(+x); }) : 'Algo salió mal. Intenta de nuevo.';
   }
-  function fmt(n){ return Math.abs(n).toLocaleString('es-ES'); }
+  function fmt(n){ return String(Math.abs(Math.trunc(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function esc(x){ return String(x).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function toast(msg){
     var t = $('toast'); t.textContent = msg; t.hidden = false;
@@ -294,17 +347,17 @@ h2{font-size:17px;margin:0 0 10px}
   function me_id(){ return uid; }
 
   function render(){
-    $('who').textContent = 'Hola, ' + me.username + (me.tag ? ' · ' + me.tag : '');
+    $('who').innerHTML = 'Hola, ' + esc(me.username) + (me.tag ? '<span class="chip tag">' + esc(me.tag) + '</span>' : '');
     $('openAdmin').hidden = !me.is_admin;
     $('frozenNote').hidden = !me.frozen;
-    $('bal').textContent = fmt(me.bal);
+    var bs = fmt(me.bal); $('bal').textContent = bs; $('bal').parentNode.className = 'bal' + (bs.length > 13 ? ' xl' : bs.length > 9 ? ' long' : '');
     $('acct').textContent = me.acct;
     $('list').innerHTML = moves.map(function(m, i){
       var cls = m.amount >= 0 ? 'in' : 'out', sign = m.amount >= 0 ? '+' : '−';
       return '<li' + (m.rc ? ' class="tap" role="button" tabindex="0" data-i="' + i + '"' : '') + '><div class="ico" aria-hidden="true">' + esc(m.icon) + '</div>' +
         '<div class="mv"><b>' + esc(m.title) + '</b><small>' + when(m.at) + (m.rc ? ' · Ver comprobante' : '') + '</small></div>' +
         '<div class="amt ' + cls + '">' + sign + ' ◈ ' + fmt(m.amount) + '</div></li>';
-    }).join('');
+    }).join('') || '<li class="empty">Aún no hay movimientos</li>';
   }
 
   /* Acceso */
