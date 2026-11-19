@@ -202,6 +202,7 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
 .panel{box-shadow:var(--sh-md),var(--edge)}
 .rc{background:var(--raise)}
 .ccard{background:linear-gradient(145deg,var(--brand),var(--brand2));box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.2)}
+#openJobs{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -244,6 +245,7 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
     <div class="actions">
       <button id="open" class="act main">⇄ Transferir</button>
       <button id="openCard" class="act">💳 Mi tarjeta</button>
+      <button id="openJobs" class="act">💼 Trabajos</button>
       <button id="openAdmin" class="act" hidden>🏛️ Banco Central</button>
     </div>
 
@@ -523,6 +525,7 @@ body{font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   $('adjCancel').onclick = function(){ $('adjBg').hidden = true; };
   $('adjBg').onclick = function(e){ if(e.target === this) this.hidden = true; };
 
+  $('openJobs').onclick = function(){ location.href = 'trabajos.html'; };
   setMode('in'); show('login');
 })();
 </script>
